@@ -16,12 +16,18 @@ const server = http.createServer(app);
 // initialize a new instance of socketIo
 const io = socketIo(server);
 
+let interval;
+// clear interval with subsequent connections
+
 io.on("connection", socket => {
-  console.log("New client connected"), setInterval(
-    () => getApiAndEmit(socket),
-    10000
-  );
-  socket.on("disconnect", () => console.log("Client disconnected"));
+  console.log("New client connected");
+  if (interval) {
+    clearInterval(interval);
+  }
+  interval = setInterval(() => getApiAndEmit(socket), 10000);
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
 });
 
 const getApiAndEmit = async socket => {
